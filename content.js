@@ -7,28 +7,30 @@
   // Config
   // ==========================================================
 
-  const ACHIEVEMENT_PROMPT = `You write Xbox 360 achievement toasts for YouTube. Generate a 2-3 word title AND a short roast subtitle.
+  const ACHIEVEMENT_PROMPT = `You write fake Xbox 360 "achievement unlocked" toasts for YouTube videos.
 
-YOU ARE ROASTING THE VIEWER, not the creator. The viewer is the target. Use their watching behavior against them. Call them out for being a gooner, an incel, chronically online, down bad, terminally on YouTube, avoiding responsibilities, etc.
+THE JOKE: The viewer clicked a normal, harmless video — but the toast treats it like a catastrophic, life-ruining decision. The humor is DARK ABSURD CONSEQUENCE, not description.
 
-BE CULTURALLY AWARE. If the video features a known person, use their cultural context to make the roast about the VIEWER funnier. Kanye video? Roast the viewer for still defending him. Andrew Tate? Call them out. Cute girl? They're down bad. Podcast bros? They need real friends.
+TITLE = the consequence itself. A punishment, disaster, or irreversible life event. NOT a label, NOT a persona, NOT a fandom name.
+SUBTITLE = a short accusatory line implying this video caused it. End with "!"
 
-RULES:
-- Title: 2-3 words, punchy meme label. Never "Achievement Unlocked".
-- Subtitle: MAX 8 words. Always end with "!"
-- Roast the VIEWER. They are a gooner, incel, or loser for watching this.
-- TikTok/Twitter energy. Feral, unhinged, no filter.
-- Mild profanity okay (damn, hell, ass). No slurs.
-- Never say "binging" or "binge".
-- Return ONLY valid JSON: {"title":"...","subtitle":"..."}
+CONSEQUENCE DOMAINS to draw from: unemployment, homelessness, divorce, custody loss, family disownment, financial ruin, public humiliation, spiritual collapse, restraining orders, FBI watchlists, therapy referrals.
 
-Examples:
-{"title":"Down Bad","subtitle":"Gooning to Kanye poetry at 2pm!"}
-{"title":"Self Report","subtitle":"Your watch history needs a restraining order!"}
-{"title":"Cooked","subtitle":"This is what no human contact does!"}
-{"title":"Incel Activities","subtitle":"Touch grass instead of this podcast!"}
-{"title":"Goblin Hours","subtitle":"Your screen time is a cry for help!"}
-{"title":"Caught in 4K","subtitle":"You really chose this over going outside!"}`;
+FORBIDDEN:
+- Identity labels (stan, bro, fan, enjoyer, addict)
+- Fandom names or personality types
+- Summarizing the video topic
+- Anything that sounds like a badge or playlist title
+- The phrase "Achievement Unlocked"
+- The word "binge" or "binging"
+
+INTERNAL PROCESS:
+1. What is banal about this video?
+2. Brainstorm 5 catastrophic consequences in different life domains.
+3. Pick the one with the BIGGEST gap between the video's triviality and the consequence's severity.
+4. If it reads like a label or description, rewrite it.
+
+Profanity okay (damn, hell, ass, shit). No slurs. Return ONLY valid JSON: {"title":"...","subtitle":"..."}`;
 
   const DEBOUNCE_MS = 2000;
   const TOAST_DURATION = 5000;
