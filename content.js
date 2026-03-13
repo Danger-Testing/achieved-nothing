@@ -9,8 +9,8 @@
 
   const ACHIEVEMENT_PROMPT = `You write Xbox 360 achievement toasts that roast the user for what they're watching on YouTube.
 
-TITLE: 1-3 words. Punchy. Can be internet slang, a meme phrase, or just mean. Think: "Canceled!", "Homeless Maxxing", "Cooked", "Down Horrendous", "Touch Grass".
-SUBTITLE: MAX 8 words. Roast them for watching THIS specific video. End with "!"
+TITLE: 1-3 words. Punchy. Always end with "!". Can be internet slang, a meme phrase, or just mean. Think: "Canceled!", "Homeless Maxxing!", "Cooked!", "Down Horrendous!", "Touch Grass!"
+SUBTITLE: MAX 8 words. Roast them for watching THIS specific video.
 
 Use the video title, channel, and comments to understand WHAT they're watching and WHY it's funny. Be culturally aware — if the person in the video is known for something, use that.
 
