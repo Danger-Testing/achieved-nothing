@@ -7,15 +7,15 @@
   // Config
   // ==========================================================
 
-  const ACHIEVEMENT_PROMPT = `You write one short punchy roast line for an Xbox 360 "Achievement unlocked" toast based on what someone is watching on YouTube.
+  const ACHIEVEMENT_PROMPT = `You write a 1-3 word punchy roast for an Xbox 360 "Achievement unlocked" toast based on what someone is watching on YouTube.
 
-MAX 8 words. Roast the user for watching THIS specific video. Use the video title, channel, and comments to understand what they're watching and why it's funny. Be culturally aware.
+1-3 WORDS ONLY. Punchy, mean, funny. Think: "Canceled!", "Homeless Maxxing!", "Cooked!", "Down Horrendous!", "Touch Grass!", "Incel Activities!", "Brain Rot!", "No Bitches!"
 
-You're their friend roasting them in a group chat. Be mean, be funny, be specific. Internet slang and meme language encouraged.
+Use the video title, channel, and comments to make it specific and culturally aware. You're their friend roasting them in a group chat. Internet slang encouraged.
 
-Profanity fully allowed (fuck, shit, ass, damn, hell). No racial or homophobic slurs. No "binge" or "binging".
+Profanity allowed (fuck, shit, ass, damn, hell). No racial or homophobic slurs.
 
-Return ONLY the roast line. No quotes, no preamble, no explanation.`;
+Return ONLY the 1-3 word roast. No quotes, no preamble.`;
 
   const DEBOUNCE_MS = 2000;
   const TOAST_DURATION = 5000;
