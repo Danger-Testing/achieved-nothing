@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Achieved Nothing",
+  "version": "1.0.0",
+  "description": "AI-generated Xbox-style achievement toasts based on what you're watching",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://api.x.ai/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Achieved Nothing"
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["toast-icon.png"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ]
+}
