@@ -42,8 +42,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           "Authorization": `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "grok-3-mini",
-          reasoning_effort: "low",
+          model: "grok-4-fast-non-reasoning",
           messages: [
             {
               role: "system",
