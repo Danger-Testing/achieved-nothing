@@ -7,18 +7,15 @@
   // Config
   // ==========================================================
 
-  const ACHIEVEMENT_PROMPT = `You write Xbox 360 achievement toasts that roast the user for what they're watching on YouTube.
+  const ACHIEVEMENT_PROMPT = `You write one short punchy roast line for an Xbox 360 "Achievement unlocked" toast based on what someone is watching on YouTube.
 
-TITLE: 1-3 words. Punchy. Always end with "!". Can be internet slang, a meme phrase, or just mean. Think: "Canceled!", "Homeless Maxxing!", "Cooked!", "Down Horrendous!", "Touch Grass!"
-SUBTITLE: MAX 8 words. Roast them for watching THIS specific video.
+MAX 8 words. Roast the user for watching THIS specific video. Use the video title, channel, and comments to understand what they're watching and why it's funny. Be culturally aware.
 
-Use the video title, channel, and comments to understand WHAT they're watching and WHY it's funny. Be culturally aware — if the person in the video is known for something, use that.
-
-The humor is MAKING FUN OF THE USER. You're their friend roasting them in a group chat. Be mean, be funny, be specific.
+You're their friend roasting them in a group chat. Be mean, be funny, be specific. Internet slang and meme language encouraged.
 
 Profanity fully allowed (fuck, shit, ass, damn, hell). No racial or homophobic slurs. No "binge" or "binging".
 
-Return ONLY valid JSON: {"title":"...","subtitle":"..."}`;
+Return ONLY the roast line. No quotes, no preamble, no explanation.`;
 
   const DEBOUNCE_MS = 2000;
   const TOAST_DURATION = 5000;
@@ -337,22 +334,11 @@ Return ONLY valid JSON: {"title":"...","subtitle":"..."}`;
         }
 
         if (res?.text) {
-          let title = "Achievement unlocked";
-          let subtitle = res.text;
-
-          // Try to parse JSON response
-          try {
-            const parsed = JSON.parse(res.text);
-            if (parsed.title) title = parsed.title;
-            if (parsed.subtitle) subtitle = parsed.subtitle;
-          } catch {
-            // Not JSON — use raw text as subtitle
-          }
-
+          const line = res.text.replace(/^["']|["']$/g, "").trim();
           devSetTiming(`✅ Done in ${elapsed}s`);
-          devSetOutput(`${title} — ${subtitle}`);
-          devLogEntry(`Request #${thisRequest} — "${title}: ${subtitle}" (${elapsed}s)`);
-          showToast(title, subtitle);
+          devSetOutput(line);
+          devLogEntry(`Request #${thisRequest} — "${line}" (${elapsed}s)`);
+          showToast("Achievement unlocked", line);
         } else {
           devSetTiming(`⚠️ Empty response (${elapsed}s)`);
           devSetOutput(`RAW: ${res?.raw || "no data"}`);
