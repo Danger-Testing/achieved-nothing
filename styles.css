@@ -137,6 +137,36 @@
   opacity: 0.85;
 }
 
+/* --- Dev Toggle Button --- */
+
+#an-dev-toggle {
+  position: fixed;
+  top: 12px;
+  right: 400px;
+  z-index: 2147483647;
+  background: rgba(0, 0, 0, 0.82);
+  color: #76b82a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+#an-dev-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 /* --- Dev Panel (right side) --- */
 
 #an-dev-panel {

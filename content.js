@@ -7,7 +7,21 @@
   // Config
   // ==========================================================
 
-  const ACHIEVEMENT_PROMPT = `Write a funny Xbox 360 achievement subtitle for what someone is watching. Max 8 words. Roast them. No quotes, no preamble. Never use the word "binging" or "binge". Examples: "Watching Pokémon at work again", "Pretending this is educational", "You were supposed to be productive"`;
+  const ACHIEVEMENT_PROMPT = `You write Xbox 360 achievement toasts for YouTube watching behavior. Generate BOTH a dynamic 2-3 word title AND a roast subtitle.
+
+Style: TikTok/Twitter energy, punchy, self-aware, slightly feral. Roast the viewer's behavior, not protected traits. Mild profanity okay (damn, hell, ass). Never use "Achievement Unlocked" as the title. Never say "binging" or "binge".
+
+Title vibes: "Self Report", "Caught in 4K", "Brainrot Detected", "Down Catastrophic", "Gremlin Mode", "Parasocial Hours", "Elite Procrastinator", "Court Evidence", "Lowkey Concerning", "Goblin Hours", "Deeply Cooked", "Side Quest", "Lore Drop", "Be Serious"
+
+Subtitle: 6-14 words, one sentence, sharp and specific to what they're watching.
+
+Examples:
+{"title":"Gremlin Mode","subtitle":"Autoplay just beat your remaining adult decision-making"}
+{"title":"Court Evidence","subtitle":"This viewing choice is now part of your digital footprint"}
+{"title":"Elite Procrastinator","subtitle":"You watched motivation content instead of doing the damn task"}
+{"title":"Parasocial Hours","subtitle":"You know this creator's lore better than your own sleep schedule"}
+
+Return ONLY valid JSON: {"title":"...","subtitle":"..."}`;
 
   const DEBOUNCE_MS = 2000;
   const TOAST_DURATION = 5000;
@@ -78,6 +92,18 @@
   // ==========================================================
   // UI Creation — Dev Panel
   // ==========================================================
+
+  const devToggle = document.createElement("button");
+  devToggle.id = "an-dev-toggle";
+  devToggle.textContent = "DEV";
+  let devVisible = true;
+
+  devToggle.addEventListener("click", () => {
+    devVisible = !devVisible;
+    devPanel.style.display = devVisible ? "flex" : "none";
+    devToggle.textContent = devVisible ? "DEV" : "DEV";
+    devToggle.style.opacity = devVisible ? "1" : "0.5";
+  });
 
   const devPanel = document.createElement("div");
   devPanel.id = "an-dev-panel";
@@ -151,8 +177,10 @@
   // ==========================================================
 
   document.documentElement.appendChild(toast);
+  document.documentElement.appendChild(devToggle);
   document.documentElement.appendChild(devPanel);
   toast.style.display = "none";
+  devToggle.style.display = "none";
   devPanel.style.display = "none";
 
   // ==========================================================
@@ -173,8 +201,8 @@
     setTimeout(() => keyInput.focus(), 500);
   }
 
-  function showToast(subtitle) {
-    toastTitle.textContent = "Achievement unlocked";
+  function showToast(title, subtitle) {
+    toastTitle.textContent = title || "Achievement unlocked";
     toastSub.style.display = "block";
     toastSub.textContent = subtitle;
     keyRow.style.display = "none";
@@ -309,10 +337,22 @@
         }
 
         if (res?.text) {
+          let title = "Achievement unlocked";
+          let subtitle = res.text;
+
+          // Try to parse JSON response
+          try {
+            const parsed = JSON.parse(res.text);
+            if (parsed.title) title = parsed.title;
+            if (parsed.subtitle) subtitle = parsed.subtitle;
+          } catch {
+            // Not JSON — use raw text as subtitle
+          }
+
           devSetTiming(`✅ Done in ${elapsed}s`);
-          devSetOutput(res.text);
-          devLogEntry(`Request #${thisRequest} — "${res.text}" (${elapsed}s)`);
-          showToast(res.text);
+          devSetOutput(`${title} — ${subtitle}`);
+          devLogEntry(`Request #${thisRequest} — "${title}: ${subtitle}" (${elapsed}s)`);
+          showToast(title, subtitle);
         } else {
           devSetTiming(`⚠️ Empty response (${elapsed}s)`);
           devSetOutput(`RAW: ${res?.raw || "no data"}`);
@@ -374,7 +414,10 @@
     lastUrl = "";
     inFlight = false;
     requestId = 0;
+    devToggle.style.display = "flex";
     devPanel.style.display = "flex";
+    devVisible = true;
+    devToggle.style.opacity = "1";
 
     devSetUrl(location.href);
     devSetDetected("—");
@@ -412,6 +455,7 @@
     toast.style.display = "none";
     toast.classList.remove("an-toast-show", "an-toast-hide");
     keyRow.style.display = "none";
+    devToggle.style.display = "none";
     devPanel.style.display = "none";
     if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
     if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
