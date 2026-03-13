@@ -22,8 +22,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   pointer-events: none;
   user-select: none;
-  min-width: 380px;
-  max-width: calc(100vw - 24px);
+  width: 480px;
   transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
