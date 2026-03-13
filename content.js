@@ -63,11 +63,17 @@
   keyRow.appendChild(keyInput);
   keyRow.appendChild(keySaveBtn);
 
+  const toastDismiss = document.createElement("button");
+  toastDismiss.id = "an-toast-dismiss";
+  toastDismiss.textContent = "✕";
+  toastDismiss.addEventListener("click", () => dismissToast());
+
   toastText.appendChild(toastTitle);
   toastText.appendChild(toastSub);
   toastText.appendChild(keyRow);
   toast.appendChild(toastIcon);
   toast.appendChild(toastText);
+  toast.appendChild(toastDismiss);
 
   // ==========================================================
   // UI Creation — Dev Panel
@@ -172,14 +178,15 @@
     toastSub.style.display = "block";
     toastSub.textContent = subtitle;
     keyRow.style.display = "none";
-    toast.style.pointerEvents = "none";
+    toastDismiss.style.display = "block";
+    toast.style.pointerEvents = "auto";
     toast.style.display = "flex";
     toast.offsetHeight;
     toast.classList.remove("an-toast-hide");
     toast.classList.add("an-toast-show");
 
     if (toastTimeout) clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => dismissToast(), TOAST_DURATION);
+    toastTimeout = null;
   }
 
   function dismissToast() {
