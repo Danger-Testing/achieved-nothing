@@ -7,30 +7,18 @@
   // Config
   // ==========================================================
 
-  const ACHIEVEMENT_PROMPT = `You write fake Xbox 360 "achievement unlocked" toasts for YouTube videos.
+  const ACHIEVEMENT_PROMPT = `You write Xbox 360 achievement toasts that roast the user for what they're watching on YouTube.
 
-THE JOKE: The viewer clicked a normal, harmless video — but the toast treats it like a catastrophic, life-ruining decision. The humor is DARK ABSURD CONSEQUENCE, not description.
+TITLE: 1-3 words. Punchy. Can be internet slang, a meme phrase, or just mean. Think: "Canceled!", "Homeless Maxxing", "Cooked", "Down Horrendous", "Touch Grass".
+SUBTITLE: MAX 8 words. Roast them for watching THIS specific video. End with "!"
 
-TITLE = the consequence itself. A punishment, disaster, or irreversible life event. NOT a label, NOT a persona, NOT a fandom name.
-SUBTITLE = a short accusatory line implying this video caused it. End with "!"
+Use the video title, channel, and comments to understand WHAT they're watching and WHY it's funny. Be culturally aware — if the person in the video is known for something, use that.
 
-CONSEQUENCE DOMAINS to draw from: unemployment, homelessness, divorce, custody loss, family disownment, financial ruin, public humiliation, spiritual collapse, restraining orders, FBI watchlists, therapy referrals.
+The humor is MAKING FUN OF THE USER. You're their friend roasting them in a group chat. Be mean, be funny, be specific.
 
-FORBIDDEN:
-- Identity labels (stan, bro, fan, enjoyer, addict)
-- Fandom names or personality types
-- Summarizing the video topic
-- Anything that sounds like a badge or playlist title
-- The phrase "Achievement Unlocked"
-- The word "binge" or "binging"
+Profanity fully allowed (fuck, shit, ass, damn, hell). No racial or homophobic slurs. No "binge" or "binging".
 
-INTERNAL PROCESS:
-1. What is banal about this video?
-2. Brainstorm 5 catastrophic consequences in different life domains.
-3. Pick the one with the BIGGEST gap between the video's triviality and the consequence's severity.
-4. If it reads like a label or description, rewrite it.
-
-Profanity okay (damn, hell, ass, shit). No slurs. Return ONLY valid JSON: {"title":"...","subtitle":"..."}`;
+Return ONLY valid JSON: {"title":"...","subtitle":"..."}`;
 
   const DEBOUNCE_MS = 2000;
   const TOAST_DURATION = 5000;
@@ -275,15 +263,18 @@ Profanity okay (damn, hell, ass, shit). No slurs. Return ONLY valid JSON: {"titl
       "#owner #channel-name a, ytd-video-owner-renderer #channel-name a, #upload-info #channel-name a"
     )?.textContent?.trim() || "";
 
-    // Get the first top-level comment
-    const commentEl = document.querySelector(
-      "ytd-comment-thread-renderer #content-text"
-    );
-    const topComment = commentEl?.textContent?.trim()?.slice(0, 120) || "";
+    // Get top 3 comments (skip pinned if possible)
+    const commentEls = document.querySelectorAll("ytd-comment-thread-renderer #content-text");
+    const comments = [];
+    commentEls.forEach((el, i) => {
+      if (i >= 4) return; // check first 4, take up to 3
+      const t = el.textContent?.trim()?.slice(0, 100);
+      if (t && t.length > 5) comments.push(t);
+    });
 
     const parts = [`Video: "${title}"`];
     if (channel) parts.push(`Channel: ${channel}`);
-    if (topComment) parts.push(`Top comment: "${topComment}"`);
+    if (comments.length > 0) parts.push(`Comments:\n${comments.slice(0, 3).join("\n")}`);
 
     return parts.join("\n");
   }
