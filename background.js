@@ -59,8 +59,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       });
 
       const json = await res.json();
+      if (json.error) {
+        sendResponse({ error: json.error.message || JSON.stringify(json.error) });
+        return;
+      }
       const text = json.choices?.[0]?.message?.content?.trim();
-      sendResponse({ text: text || "Existing" });
+      sendResponse({ text: text || "", raw: JSON.stringify(json).slice(0, 300) });
     } catch (e) {
       sendResponse({ error: e.message });
     }

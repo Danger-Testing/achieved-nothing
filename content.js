@@ -306,6 +306,10 @@
           devSetOutput(res.text);
           devLogEntry(`Request #${thisRequest} — "${res.text}" (${elapsed}s)`);
           showToast(res.text);
+        } else {
+          devSetTiming(`⚠️ Empty response (${elapsed}s)`);
+          devSetOutput(`RAW: ${res?.raw || "no data"}`);
+          devLogEntry(`Request #${thisRequest} — empty response`);
         }
       }
     );
