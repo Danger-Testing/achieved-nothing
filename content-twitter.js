@@ -159,6 +159,7 @@ Return ONLY the two lines. No quotes, no preamble.`;
   // ==========================================================
 
   function revealCard() {
+    return; // TEMP: card hidden
     if (cardShown) return;
     card.style.display = "flex";
     card.offsetHeight;
