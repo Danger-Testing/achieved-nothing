@@ -314,6 +314,7 @@
   box-shadow: 0 2px 14px rgba(160, 90, 230, 0.13);
   pointer-events: auto;
   user-select: none;
+  overflow: visible;
   opacity: 0;
   transform: translateY(-5px) scale(0.96);
   transition: opacity 0.2s ease, transform 0.22s ease;
@@ -338,14 +339,10 @@
   width: 100%;
 }
 
-/* Top row: pill full-width, triangle overlaps from the left */
-.rs-top-row {
-  position: relative;
-}
-
+/* Arrow: z-stacked inside pill, bleeds -10px past the pill's left edge */
 .rs-arrow {
   position: absolute;
-  left: 10px;
+  left: -10px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 2;
@@ -374,8 +371,9 @@
 .rs-btn-supportive {
   width: 100%;
   position: relative;
+  overflow: visible;
   border-radius: 100px;
-  padding: 10px 15px 10px 38px;
+  padding: 10px 15px;
   display: flex;
   align-items: center;
   overflow: hidden;

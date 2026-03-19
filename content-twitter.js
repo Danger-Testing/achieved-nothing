@@ -472,14 +472,12 @@ Rules:
   rsCard.id = "rs-card";
   rsCard.innerHTML = `
     <div id="rs-body">
-      <div class="rs-top-row">
+      <button class="rs-btn rs-btn-supportive" id="rs-supportive">
         <svg class="rs-arrow" width="20" height="26" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2.5 2 L17.5 13 L2.5 24 Z" fill="#FFE040" stroke="#E87820" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
         </svg>
-        <button class="rs-btn rs-btn-supportive" id="rs-supportive">
-          <span class="rs-btn-label">Nice</span>
-        </button>
-      </div>
+        <span class="rs-btn-label">Nice</span>
+      </button>
       <button class="rs-btn rs-btn-critical" id="rs-critical">
         <span class="rs-btn-label">Not Nice</span>
       </button>
