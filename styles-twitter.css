@@ -2,19 +2,22 @@
    Achieved Nothing — Twitter/X Styles (Pokémon Habitat Card)
    ============================================================ */
 
+/* --- Pokémon Habitat Card --- */
+
 #pd-card {
   position: fixed;
   top: 16px;
-  right: -440px;
+  right: -420px;
   z-index: 2147483647;
   display: flex;
   flex-direction: column;
-  width: 400px;
-  border-radius: 30px 0 0 30px;
-  overflow: visible;
+  width: 360px;
+  border-radius: 0 24px 24px 0;
+  overflow: hidden;
   pointer-events: none;
   user-select: none;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   transition: right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -23,78 +26,64 @@
 }
 
 #pd-card.pd-card-hide {
-  right: -440px;
+  right: -420px;
   transition: right 0.4s cubic-bezier(0.55, 0, 1, 0.45);
 }
 
-/* --- Header (indigo frosted glass) --- */
+/* --- Header Section (dark indigo) --- */
 
 #pd-card-header {
-  background: rgba(72, 75, 165, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 18px 28px 14px 28px;
-  border-radius: 30px 0 0 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-right: none;
+  background: #5859A0;
+  padding: 14px 20px 12px 20px;
 }
 
 /* --- Title --- */
 
 #pd-card-title {
   color: #ffffff;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
   line-height: 1.3;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Separator --- */
+/* --- Separator Line --- */
 
 #pd-card-sep {
-  height: 1.5px;
-  background: rgba(255, 255, 255, 0.5);
-  margin: 10px 0 8px 0;
-  margin-right: 20px;
+  height: 1px;
+  background: #ffffff;
+  margin: 8px 0 6px 0;
 }
 
 /* --- Subtitle --- */
 
 #pd-card-sub {
-  color: #FFB347;
-  font-size: 18px;
+  color: #F7A124;
+  font-size: 17px;
   font-weight: 600;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.1px;
   line-height: 1.3;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Footer (light frosted glass with sprite area) --- */
+/* --- Footer Section (light lavender with sprite) --- */
 
 #pd-card-footer {
-  background: rgba(200, 205, 230, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 16px 28px;
-  border-radius: 0 0 0 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: none;
-  border-top: none;
+  background: #C6C7E2;
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  min-height: 70px;
+  min-height: 90px;
 }
 
-/* --- Glow circle --- */
+/* --- Glow circle behind sprite --- */
 
 #pd-card-glow {
   position: absolute;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 70%);
   border-radius: 50%;
 }
 
@@ -103,22 +92,21 @@
 #pd-card-sprite {
   position: relative;
   z-index: 1;
-  font-size: 32px;
-  color: rgba(72, 75, 165, 0.6);
+  font-size: 36px;
+  color: rgba(88, 89, 160, 0.5);
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-/* --- Dismiss --- */
+/* --- Dismiss Button --- */
 
 #pd-card-dismiss {
   position: absolute;
-  top: -6px;
-  left: -6px;
-  background: rgba(72, 75, 165, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  top: 6px;
+  left: -28px;
+  background: #5859A0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
   cursor: pointer;
   width: 22px;
   height: 22px;
@@ -134,24 +122,24 @@
 
 #pd-card-dismiss:hover {
   color: #fff;
-  background: rgba(72, 75, 165, 1);
+  background: #4A4B8A;
 }
 
-/* --- Key Input --- */
+/* --- Key Input Row --- */
 
 #pd-key-row {
   display: none;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 10px;
   width: 100%;
 }
 
 #pd-key-input {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
   padding: 8px 10px;
   font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
   font-size: 12px;
@@ -162,14 +150,14 @@
 }
 
 #pd-key-input:focus {
-  border-color: #FFB347;
+  border-color: #F7A124;
 }
 
 #pd-key-save {
-  background: #FFB347;
+  background: #F7A124;
   color: #333;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   width: 34px;
   height: 34px;
   font-size: 16px;
