@@ -24,6 +24,7 @@ RULES:
 Return ONLY the two lines. No quotes, no preamble.`;
 
   const DEBOUNCE_MS = 2500;
+  const ZONE_PADDING = 4;
 
   // ==========================================================
   // State
@@ -140,12 +141,18 @@ Return ONLY the two lines. No quotes, no preamble.`;
   card.appendChild(cardInner);
   card.appendChild(cardDismiss);
 
+  // Detection zone overlay
+  const zone = document.createElement("div");
+  zone.id = "pd-zone";
+
   // ==========================================================
   // Mount
   // ==========================================================
 
   document.documentElement.appendChild(card);
+  document.documentElement.appendChild(zone);
   card.style.display = "none";
+  zone.style.display = "none";
 
   // ==========================================================
   // Card Display
@@ -241,6 +248,19 @@ Return ONLY the two lines. No quotes, no preamble.`;
     return best;
   }
 
+  function snapZoneToArticle(article) {
+    if (!article) {
+      zone.style.display = "none";
+      return;
+    }
+    const rect = article.getBoundingClientRect();
+    zone.style.display = "block";
+    zone.style.top = (rect.top - ZONE_PADDING) + "px";
+    zone.style.left = (rect.left - ZONE_PADDING) + "px";
+    zone.style.width = (rect.width + ZONE_PADDING * 2) + "px";
+    zone.style.height = (rect.height + ZONE_PADDING * 2) + "px";
+  }
+
   // ==========================================================
   // Content Extraction — from centered article
   // ==========================================================
@@ -328,12 +348,15 @@ Return ONLY the two lines. No quotes, no preamble.`;
   function updateZoneOnScroll() {
     if (!enabled) return;
     const article = findMostCenteredArticle();
-    if (article && article !== currentArticle) {
-      currentArticle = article;
-      if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        if (!inFlight) onArticleChanged();
-      }, DEBOUNCE_MS);
+    if (article) {
+      snapZoneToArticle(article);
+      if (article !== currentArticle) {
+        currentArticle = article;
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          if (!inFlight) onArticleChanged();
+        }, DEBOUNCE_MS);
+      }
     }
   }
 
@@ -409,6 +432,7 @@ Return ONLY the two lines. No quotes, no preamble.`;
     lastUrl = "";
     currentArticle = null;
     hideCard();
+    zone.style.display = "none";
     keyRow.style.display = "none";
     if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
     if (scrollRaf) { cancelAnimationFrame(scrollRaf); scrollRaf = null; }
