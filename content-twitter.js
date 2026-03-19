@@ -458,13 +458,15 @@ Return ONLY the two lines. No quotes, no preamble.`;
 
 (() => {
   const REPLY_PROMPT = `Generate button labels and full replies for a tweet. Output EXACTLY four lines:
-Line 1: Short label for the "nice" button (2-5 words, action-style, contextual to the tweet — e.g. "glaze 2k", "hype this", "ride for him")
-Line 2: Short label for the "not nice" button (2-5 words, action-style, contextual — e.g. "shit on 2k", "clown this", "ratio him")
-Line 3: Full supportive reply tweet (under 200 chars, warm/agreeable, sounds like a real tweet)
-Line 4: Full critical reply tweet (under 200 chars, pushes back/challenges, sounds like a real tweet)
+Line 1: Short label for the "nice" button (2-5 words, Gen Z, literal to the tweet content — e.g. "glaze lebron", "cry about taylor", "defend the hotdog")
+Line 2: Short label for the "not nice" button (2-5 words, Gen Z, literal and cutting — e.g. "bury 2k", "embarrass this guy", "destroy the take")
+Line 3: Full supportive reply (under 200 chars, agreeable, sounds like a real tweet)
+Line 4: Full critical reply (under 200 chars, offensive and harsh, genuinely tears into the tweet or the person, sounds like a real tweet)
 
 Rules:
-- Labels should be subtly contextual, not extreme — mild variations tied to the topic
+- Labels must be specific to the actual tweet topic — never generic
+- No millennial words: no "hype", "clown", "ride for", "slay", "vibe"
+- Critical reply should have real bite, not just mild disagreement
 - Output ONLY the four lines. No numbering, no quotes, no extra text.`;
 
   // --- Build UI ---
