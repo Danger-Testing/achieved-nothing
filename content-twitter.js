@@ -457,18 +457,25 @@ Return ONLY the two lines. No quotes, no preamble.`;
 // ============================================================
 
 (() => {
-  const REPLY_PROMPT = `Generate button labels and full replies for a tweet. Output EXACTLY four lines:
-Line 1: Short label for the "nice" button — action verb + specific subject from the tweet (e.g. "defend drake", "big up the sprite ad", "back the robot")
-Line 2: Short label for the "not nice" button — action verb + specific subject from the tweet (e.g. "trash the nostalgia bait", "bury this take", "roast the sprite ad")
-Line 3: Full supportive reply (under 200 chars, agreeable, sounds like a real tweet)
-Line 4: Full critical reply (under 200 chars, offensive — genuinely tears into the tweet or the person, sounds like a real tweet)
+  const REPLY_PROMPT = `You generate two Twitter reply options based on how people actually behave during celebrity drama and cancel culture on Twitter/X.
+
+Output EXACTLY four lines:
+Line 1: Short label for the supportive move (2-5 words, verb + specific name/subject — e.g. "back miley up", "co-sign this", "stan alex here")
+Line 2: Short label for the destructive move (2-5 words, verb + specific name/subject — e.g. "cancel alex", "start a rumor about her", "drop receipts on miley", "i knew this about her")
+Line 3: Full supportive reply (under 200 chars — defending, co-signing, stanning — sounds like a real person tweeting, not a statement)
+Line 4: Full destructive reply (under 200 chars — pick ONE of these authentic Twitter cancel culture moves and commit to it:
+  • Spread or imply a rumor: "allegedly...", "I heard...", "a source close to them told me...", "not surprised tbh"
+  • Cancel outright: "[name] is cancelled", call for real consequences
+  • Drop receipts energy: "this has been known", "the pattern is clear", "I've been saying this for years"
+  • Pile on with a new angle: "AND another thing about her...", add a new accusation
+  • Imply insider knowledge: "everyone in the industry knows...", "ask anyone who's actually met them"
+Must sound like an actual person on Twitter — mean, specific, first-person. Not a news headline.)
 
 Rules:
-- Labels MUST start with an action verb. They describe what you are doing, not what the tweet is about.
-- Labels must be specific to the actual content — never generic filler
-- Critical reply should be mean and have real bite
-- Never use any of these words: expose, bash, slam, blast, drag, endorse, roast, call out, ratio, critique, defend, support, praise
-- Output ONLY the four lines. No numbering, no quotes, no extra text.`;
+- Labels name the actual social move: "cancel [name]", "start a rumor about [name]", "back [name] up"
+- Labels use the real person's name or the specific subject of the tweet — never abstract
+- Banned words (never use): expose, bash, slam, blast, endorse, roast, ratio, critique, clown, problematic, accountable, hold accountable, drag
+- Output ONLY the four lines. No numbering, no quotes, no labels, no extra text.`;
 
   // --- Build UI ---
   const rsCard = document.createElement("div");
