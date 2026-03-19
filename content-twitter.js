@@ -1,5 +1,5 @@
 // ============================================================
-// Achieved Nothing — Twitter/X Content Script (Pokémon Style)
+// Achieved Nothing — Twitter/X Content Script (Pokédex Style)
 // ============================================================
 
 (() => {
@@ -41,47 +41,74 @@ Return ONLY the two lines. No quotes, no preamble.`;
   let scrollDebounce = null;
 
   // ==========================================================
-  // UI Creation — Pokémon Habitat Card
+  // UI Creation — Pokédex Device Card
   // ==========================================================
 
   const card = document.createElement("div");
   card.id = "pd-card";
 
-  const cardHeader = document.createElement("div");
-  cardHeader.id = "pd-card-header";
+  const cardInner = document.createElement("div");
+  cardInner.id = "pd-card-inner";
 
-  const cardTitle = document.createElement("div");
-  cardTitle.id = "pd-card-title";
-  cardTitle.textContent = "Nearby Habitats";
+  // Top bar
+  const topbar = document.createElement("div");
+  topbar.id = "pd-topbar";
 
-  const cardSep = document.createElement("div");
-  cardSep.id = "pd-card-sep";
+  const ledMain = document.createElement("div");
+  ledMain.id = "pd-led-main";
 
-  const cardSub = document.createElement("div");
-  cardSub.id = "pd-card-sub";
-  cardSub.textContent = "";
+  const ledRed = document.createElement("div");
+  ledRed.className = "pd-led-sm pd-led-red";
 
-  cardHeader.appendChild(cardTitle);
-  cardHeader.appendChild(cardSep);
-  cardHeader.appendChild(cardSub);
+  const ledYellow = document.createElement("div");
+  ledYellow.className = "pd-led-sm pd-led-yellow";
 
-  const cardFooter = document.createElement("div");
-  cardFooter.id = "pd-card-footer";
+  const ledGreen = document.createElement("div");
+  ledGreen.className = "pd-led-sm pd-led-green";
 
-  const cardGlow = document.createElement("div");
-  cardGlow.id = "pd-card-glow";
+  const topbarLabel = document.createElement("div");
+  topbarLabel.id = "pd-topbar-label";
+  topbarLabel.textContent = "POKÉDEX";
 
-  const cardSprite = document.createElement("div");
-  cardSprite.id = "pd-card-sprite";
-  cardSprite.textContent = "?";
+  topbar.appendChild(ledMain);
+  topbar.appendChild(ledRed);
+  topbar.appendChild(ledYellow);
+  topbar.appendChild(ledGreen);
+  topbar.appendChild(topbarLabel);
 
-  cardFooter.appendChild(cardGlow);
-  cardFooter.appendChild(cardSprite);
+  // Body with screen
+  const body = document.createElement("div");
+  body.id = "pd-body";
 
-  card.appendChild(cardHeader);
-  card.appendChild(cardFooter);
+  const screen = document.createElement("div");
+  screen.id = "pd-screen";
 
-  // Key input row (lives inside the card header)
+  const screenTitle = document.createElement("div");
+  screenTitle.id = "pd-screen-title";
+  screenTitle.textContent = "Scanning…";
+
+  screen.appendChild(screenTitle);
+  body.appendChild(screen);
+
+  // Divider
+  const divider = document.createElement("div");
+  divider.id = "pd-divider";
+
+  // Bottom panel
+  const bottom = document.createElement("div");
+  bottom.id = "pd-bottom";
+
+  const bottomText = document.createElement("div");
+  bottomText.id = "pd-bottom-text";
+  bottomText.textContent = "";
+
+  const indicator = document.createElement("div");
+  indicator.id = "pd-indicator";
+
+  bottom.appendChild(bottomText);
+  bottom.appendChild(indicator);
+
+  // Key input (lives inside the screen)
   const keyRow = document.createElement("div");
   keyRow.id = "pd-key-row";
 
@@ -92,17 +119,25 @@ Return ONLY the two lines. No quotes, no preamble.`;
 
   const keySaveBtn = document.createElement("button");
   keySaveBtn.id = "pd-key-save";
-  keySaveBtn.textContent = "→";
+  keySaveBtn.textContent = "Save Key";
 
   keyRow.appendChild(keyInput);
   keyRow.appendChild(keySaveBtn);
-  cardHeader.appendChild(keyRow);
+  screen.appendChild(keyRow);
 
-  // Dismiss button
+  // Assemble inner
+  cardInner.appendChild(topbar);
+  cardInner.appendChild(body);
+  cardInner.appendChild(divider);
+  cardInner.appendChild(bottom);
+
+  // Dismiss button (outside inner for overflow)
   const cardDismiss = document.createElement("button");
   cardDismiss.id = "pd-card-dismiss";
   cardDismiss.textContent = "✕";
   cardDismiss.addEventListener("click", () => dismissCard());
+
+  card.appendChild(cardInner);
   card.appendChild(cardDismiss);
 
   // ==========================================================
@@ -117,12 +152,10 @@ Return ONLY the two lines. No quotes, no preamble.`;
   // ==========================================================
 
   function showKeyCard() {
-    cardTitle.textContent = "Enter your Grok API key";
-    cardSub.textContent = "";
-    cardSub.style.display = "none";
-    cardSep.style.display = "none";
-    cardFooter.style.display = "none";
+    screenTitle.textContent = "Enter API Key";
     keyRow.style.display = "flex";
+    bottom.style.display = "none";
+    divider.style.display = "none";
     card.style.display = "flex";
     card.offsetHeight;
     card.classList.remove("pd-card-hide");
@@ -132,12 +165,11 @@ Return ONLY the two lines. No quotes, no preamble.`;
   }
 
   function showCard(habitat, subtitle) {
-    cardTitle.textContent = habitat || "Nearby Habitats";
-    cardSub.textContent = subtitle || "";
-    cardSub.style.display = "block";
-    cardSep.style.display = "block";
-    cardFooter.style.display = "flex";
+    screenTitle.textContent = habitat || "Unknown Habitat";
     keyRow.style.display = "none";
+    bottomText.textContent = subtitle || "A wild viewer appeared";
+    bottom.style.display = "flex";
+    divider.style.display = "block";
     card.style.display = "flex";
     card.offsetHeight;
     card.classList.remove("pd-card-hide");
@@ -166,7 +198,7 @@ Return ONLY the two lines. No quotes, no preamble.`;
     if (!key) return;
     chrome.storage.local.set({ an_api_key: key }, () => {
       hasKey = true;
-      cardTitle.textContent = "Key saved ✓";
+      screenTitle.textContent = "Key saved ✓";
       keyRow.style.display = "none";
       setTimeout(() => {
         dismissCard();
