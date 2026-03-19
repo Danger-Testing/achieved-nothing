@@ -466,7 +466,8 @@ Line 4: Full critical reply (under 200 chars, offensive — genuinely tears into
 Rules:
 - Labels MUST start with an action verb. They describe what you are doing, not what the tweet is about.
 - Labels must be specific to the actual content — never generic filler
-- Critical reply should be mean and have real bite, never use the word "expose"
+- Critical reply should be mean and have real bite
+- Never use any of these words: expose, bash, slam, blast, drag, endorse, roast, call out, ratio, critique, defend, support, praise
 - Output ONLY the four lines. No numbering, no quotes, no extra text.`;
 
   // --- Build UI ---
