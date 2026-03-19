@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Achieved Nothing",
   "version": "1.0.0",
-  "description": "AI-generated Xbox-style achievement toasts based on what you're watching",
+  "description": "AI-generated achievement toasts — Xbox style on YouTube, Pokémon style on Twitter/X",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["https://api.x.ai/*"],
   "background": {
@@ -13,6 +13,12 @@
       "matches": ["https://www.youtube.com/*"],
       "js": ["content.js"],
       "css": ["styles.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://twitter.com/*", "https://x.com/*"],
+      "js": ["content-twitter.js"],
+      "css": ["styles-twitter.css"],
       "run_at": "document_idle"
     }
   ],

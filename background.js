@@ -23,7 +23,7 @@ chrome.action.onClicked.addListener(async (tab) => {
   });
 });
 
-// --- Grok API Handler ---
+// --- Grok API Handler (shared by YouTube + Twitter content scripts) ---
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg?.type !== "an:grok") return;
 
@@ -53,7 +53,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
               content: msg.content,
             },
           ],
-          max_tokens: 30,
+          max_tokens: msg.maxTokens || 30,
           temperature: 1,
         }),
       });
