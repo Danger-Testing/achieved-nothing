@@ -282,3 +282,160 @@
   border-radius: 0;
   transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
 }
+
+/* ============================================================
+   Reply Suggester — Pokémon dialog style
+   ============================================================ */
+
+@font-face {
+  font-family: 'Exec';
+  src: url(chrome-extension://__MSG_@@extension_id__/exec-regular.ttf) format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+#rs-card,
+#rs-card * {
+  font-family: 'Exec', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+#rs-card {
+  position: fixed;
+  z-index: 2147483647;
+  width: 252px;
+  /* blob: each corner slightly different */
+  border-radius: 22px 17px 22px 17px / 17px 22px 17px 22px;
+  background: #FEFEFE;
+  border: 2px solid #CEB0EC;
+  padding: 11px 12px 13px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 14px rgba(160, 90, 230, 0.13);
+  pointer-events: auto;
+  user-select: none;
+  opacity: 0;
+  transform: translateY(-5px) scale(0.96);
+  transition: opacity 0.2s ease, transform 0.22s ease;
+}
+
+#rs-card.rs-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+#rs-card.rs-hide {
+  opacity: 0;
+  transform: translateY(-5px) scale(0.96);
+  pointer-events: none;
+}
+
+#rs-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+}
+
+/* Top row: pill full-width, triangle overlaps from the left */
+.rs-top-row {
+  position: relative;
+}
+
+.rs-arrow {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  display: block;
+}
+
+/* --- Shared button resets --- */
+.rs-btn {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  pointer-events: auto;
+  transition: opacity 0.15s;
+  text-align: left;
+  width: 100%;
+}
+
+.rs-btn:hover { opacity: 0.76; }
+.rs-btn:disabled,
+#rs-card.rs-loading .rs-btn { opacity: 0.42; cursor: default; }
+
+/* --- Yellow pill (supportive) --- */
+.rs-btn-supportive {
+  width: 100%;
+  position: relative;
+  border-radius: 100px;
+  padding: 10px 15px 10px 38px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  /* gradient: lighter/warmer center, richer at edges */
+  background:
+    radial-gradient(ellipse at 42% 32%, #FFF89E 0%, #FFE040 52%, #FFD018 100%);
+}
+
+/* diagonal grain texture overlay */
+.rs-btn-supportive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: repeating-linear-gradient(
+    -48deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(160, 110, 0, 0.055) 2px,
+    rgba(160, 110, 0, 0.055) 3px
+  );
+  pointer-events: none;
+}
+
+.rs-btn-supportive .rs-btn-label {
+  position: relative;
+  z-index: 1;
+  color: #2B1C00;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* --- Plain text (critical) --- */
+.rs-btn-critical {
+  position: relative;
+  padding: 2px 1px 2px 2px;
+  overflow: hidden;
+}
+
+/* subtle texture on the white area */
+.rs-btn-critical::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -48deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.018) 3px,
+    rgba(0, 0, 0, 0.018) 4px
+  );
+  pointer-events: none;
+}
+
+.rs-btn-critical .rs-btn-label {
+  position: relative;
+  z-index: 1;
+  color: #4A4A4A;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: left;
+}

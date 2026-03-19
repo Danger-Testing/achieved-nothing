@@ -33,6 +33,10 @@
     {
       "resources": ["toast-icon.png"],
       "matches": ["https://www.youtube.com/*"]
+    },
+    {
+      "resources": ["exec-regular.ttf"],
+      "matches": ["https://twitter.com/*", "https://x.com/*"]
     }
   ]
 }

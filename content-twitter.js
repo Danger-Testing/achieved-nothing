@@ -451,3 +451,169 @@ Return ONLY the two lines. No quotes, no preamble.`;
     }
   });
 })();
+
+// ============================================================
+// Reply Suggester — Pokémon-style reply assist popup
+// ============================================================
+
+(() => {
+  const REPLY_PROMPT = `Generate button labels and full replies for a tweet. Output EXACTLY four lines:
+Line 1: Short label for the "nice" button (2-5 words, action-style, contextual to the tweet — e.g. "glaze 2k", "hype this", "ride for him")
+Line 2: Short label for the "not nice" button (2-5 words, action-style, contextual — e.g. "shit on 2k", "clown this", "ratio him")
+Line 3: Full supportive reply tweet (under 200 chars, warm/agreeable, sounds like a real tweet)
+Line 4: Full critical reply tweet (under 200 chars, pushes back/challenges, sounds like a real tweet)
+
+Rules:
+- Labels should be subtly contextual, not extreme — mild variations tied to the topic
+- Output ONLY the four lines. No numbering, no quotes, no extra text.`;
+
+  // --- Build UI ---
+  const rsCard = document.createElement("div");
+  rsCard.id = "rs-card";
+  rsCard.innerHTML = `
+    <div id="rs-body">
+      <div class="rs-top-row">
+        <svg class="rs-arrow" width="20" height="26" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.5 2 L17.5 13 L2.5 24 Z" fill="#FFE040" stroke="#E87820" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <button class="rs-btn rs-btn-supportive" id="rs-supportive">
+          <span class="rs-btn-label">Nice</span>
+        </button>
+      </div>
+      <button class="rs-btn rs-btn-critical" id="rs-critical">
+        <span class="rs-btn-label">Not Nice</span>
+      </button>
+    </div>
+  `;
+  document.documentElement.appendChild(rsCard);
+
+  let rsVisible = false;
+  let rsRequestId = 0;
+  let lastDetectedCompose = null;
+  let positionRaf = null;
+  const generatedReplies = { supportive: "", critical: "" };
+
+  const rsSupportive = rsCard.querySelector("#rs-supportive");
+  const rsCritical = rsCard.querySelector("#rs-critical");
+  const rsSupLabel = rsSupportive.querySelector(".rs-btn-label");
+  const rsCritLabel = rsCritical.querySelector(".rs-btn-label");
+
+  rsCard.addEventListener("click", (e) => e.stopPropagation());
+
+  function positionCard() {
+    const compose = document.querySelector('[data-testid="tweetTextarea_0"]');
+    if (!compose) return;
+    const rect = compose.getBoundingClientRect();
+    rsCard.style.top = (rect.bottom + 6) + "px";
+    rsCard.style.right = (window.innerWidth - rect.right) + "px";
+  }
+
+  function startPositionTracking() {
+    function loop() {
+      if (rsVisible) {
+        positionCard();
+        positionRaf = requestAnimationFrame(loop);
+      }
+    }
+    positionRaf = requestAnimationFrame(loop);
+  }
+
+  function stopPositionTracking() {
+    if (positionRaf) { cancelAnimationFrame(positionRaf); positionRaf = null; }
+  }
+
+  function showRsCard() {
+    positionCard();
+    rsCard.offsetHeight;
+    rsCard.classList.remove("rs-hide");
+    rsCard.classList.add("rs-show");
+    rsVisible = true;
+    startPositionTracking();
+  }
+
+  function hideRsCard() {
+    rsCard.classList.remove("rs-show");
+    rsCard.classList.add("rs-hide");
+    rsVisible = false;
+    stopPositionTracking();
+  }
+
+  function setLoading(isLoading) {
+    rsSupportive.disabled = isLoading;
+    rsCritical.disabled = isLoading;
+    rsCard.classList.toggle("rs-loading", isLoading);
+  }
+
+  function insertReply(text) {
+    if (!text) return;
+    const compose = document.querySelector('[data-testid="tweetTextarea_0"]');
+    const editable = compose?.querySelector('[contenteditable="true"]');
+    if (!editable) return;
+    editable.focus();
+    document.execCommand("selectAll", false, null);
+    document.execCommand("insertText", false, text);
+    hideRsCard();
+  }
+
+  rsSupportive.addEventListener("click", () => insertReply(generatedReplies.supportive));
+  rsCritical.addEventListener("click", () => insertReply(generatedReplies.critical));
+
+  function getTweetContext(composeEl) {
+    const dialog = composeEl.closest('[role="dialog"]');
+    const searchRoot = dialog || document;
+    const tweetEls = searchRoot.querySelectorAll('[data-testid="tweetText"]');
+    if (tweetEls.length > 0) {
+      return tweetEls[0].textContent.trim().slice(0, 500);
+    }
+    return "";
+  }
+
+  function generateReplies(tweetText) {
+    generatedReplies.supportive = "";
+    generatedReplies.critical = "";
+    rsSupLabel.textContent = "Nice";
+    rsCritLabel.textContent = "Not Nice";
+    setLoading(true);
+    rsRequestId++;
+    const thisId = rsRequestId;
+
+    chrome.runtime.sendMessage(
+      {
+        type: "an:grok",
+        prompt: REPLY_PROMPT,
+        content: `Tweet: "${tweetText}"`,
+        maxTokens: 350,
+      },
+      (res) => {
+        if (thisId !== rsRequestId) return;
+        setLoading(false);
+
+        if (res?.error || !res?.text) return;
+
+        const lines = res.text.trim().split("\n").filter(Boolean);
+        rsSupLabel.textContent = lines[0]?.trim() || "Nice";
+        rsCritLabel.textContent = lines[1]?.trim() || "Not Nice";
+        generatedReplies.supportive = lines[2]?.trim() || "";
+        generatedReplies.critical = lines[3]?.trim() || "";
+      }
+    );
+  }
+
+  function checkForComposeBox() {
+    const compose = document.querySelector('[data-testid="tweetTextarea_0"]');
+    if (compose && compose !== lastDetectedCompose) {
+      lastDetectedCompose = compose;
+      const tweetText = getTweetContext(compose);
+      if (tweetText) {
+        showRsCard();
+        generateReplies(tweetText);
+      }
+    } else if (!compose && lastDetectedCompose) {
+      lastDetectedCompose = null;
+      if (rsVisible) hideRsCard();
+    }
+  }
+
+  const rsObserver = new MutationObserver(() => checkForComposeBox());
+  rsObserver.observe(document.body, { childList: true, subtree: true });
+})();
