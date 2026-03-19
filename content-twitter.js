@@ -24,7 +24,6 @@ RULES:
 Return ONLY the two lines. No quotes, no preamble.`;
 
   const DEBOUNCE_MS = 2500;
-  const CARD_DURATION = 6000;
 
   // ==========================================================
   // State
@@ -37,8 +36,9 @@ Return ONLY the two lines. No quotes, no preamble.`;
   let lastTweetText = "";
   let lastUrl = "";
   let debounceTimer = null;
-  let cardTimeout = null;
-  let scrollDebounce = null;
+  let cardShown = false;
+  let currentArticle = null;
+  let scrollRaf = null;
 
   // ==========================================================
   // UI Creation — Pokédex Device Card
@@ -135,7 +135,7 @@ Return ONLY the two lines. No quotes, no preamble.`;
   const cardDismiss = document.createElement("button");
   cardDismiss.id = "pd-card-dismiss";
   cardDismiss.textContent = "✕";
-  cardDismiss.addEventListener("click", () => dismissCard());
+  cardDismiss.addEventListener("click", () => hideCard());
 
   card.appendChild(cardInner);
   card.appendChild(cardDismiss);
@@ -151,16 +151,21 @@ Return ONLY the two lines. No quotes, no preamble.`;
   // Card Display
   // ==========================================================
 
+  function revealCard() {
+    if (cardShown) return;
+    card.style.display = "flex";
+    card.offsetHeight;
+    card.classList.remove("pd-card-hide");
+    card.classList.add("pd-card-show");
+    cardShown = true;
+  }
+
   function showKeyCard() {
     screenTitle.textContent = "Enter API Key";
     keyRow.style.display = "flex";
     bottom.style.display = "none";
     divider.style.display = "none";
-    card.style.display = "flex";
-    card.offsetHeight;
-    card.classList.remove("pd-card-hide");
-    card.classList.add("pd-card-show");
-    if (cardTimeout) { clearTimeout(cardTimeout); cardTimeout = null; }
+    revealCard();
     setTimeout(() => keyInput.focus(), 400);
   }
 
@@ -170,19 +175,13 @@ Return ONLY the two lines. No quotes, no preamble.`;
     bottomText.textContent = subtitle || "A wild viewer appeared";
     bottom.style.display = "flex";
     divider.style.display = "block";
-    card.style.display = "flex";
-    card.offsetHeight;
-    card.classList.remove("pd-card-hide");
-    card.classList.add("pd-card-show");
-
-    if (cardTimeout) clearTimeout(cardTimeout);
-    cardTimeout = setTimeout(() => dismissCard(), CARD_DURATION);
+    revealCard();
   }
 
-  function dismissCard() {
+  function hideCard() {
     card.classList.remove("pd-card-show");
     card.classList.add("pd-card-hide");
-    if (cardTimeout) { clearTimeout(cardTimeout); cardTimeout = null; }
+    cardShown = false;
     setTimeout(() => {
       card.style.display = "none";
       card.classList.remove("pd-card-hide");
@@ -200,9 +199,11 @@ Return ONLY the two lines. No quotes, no preamble.`;
       hasKey = true;
       screenTitle.textContent = "Key saved ✓";
       keyRow.style.display = "none";
+      bottom.style.display = "flex";
+      divider.style.display = "block";
+      bottomText.textContent = "Scanning…";
       setTimeout(() => {
-        dismissCard();
-        if (enabled && !inFlight) onContentChanged();
+        if (enabled && !inFlight) onArticleChanged();
       }, 1000);
     });
   }
@@ -214,37 +215,50 @@ Return ONLY the two lines. No quotes, no preamble.`;
   card.addEventListener("click", (e) => e.stopPropagation());
 
   // ==========================================================
-  // Content Extraction — Twitter/X
+  // Viewport Zone Recognizer (from Cortisol Maxxer)
   // ==========================================================
 
-  function getPageContext() {
-    const primaryTweet = document.querySelector('[data-testid="tweetText"]');
+  function findMostCenteredArticle() {
+    const articles = document.querySelectorAll(
+      'article, [data-testid="tweet"], [role="article"]'
+    );
+    if (articles.length === 0) return null;
 
-    const authorEl = document.querySelector(
+    const vpCenter = window.innerHeight / 2;
+    let best = null;
+    let bestDist = Infinity;
+
+    articles.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.height < 30 || rect.bottom < 0 || rect.top > window.innerHeight) return;
+      const dist = Math.abs(rect.top + rect.height / 2 - vpCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = el;
+      }
+    });
+
+    return best;
+  }
+
+  // ==========================================================
+  // Content Extraction — from centered article
+  // ==========================================================
+
+  function getArticleContext(article) {
+    if (!article) return "";
+
+    const tweetTextEl = article.querySelector('[data-testid="tweetText"]');
+    const tweetText = tweetTextEl?.textContent?.trim()?.slice(0, 500) || "";
+    if (!tweetText || tweetText.length < 5) return "";
+
+    const authorEl = article.querySelector(
       '[data-testid="User-Name"] a[role="link"] span'
     );
     const author = authorEl?.textContent?.trim() || "";
 
-    let tweetText = "";
-    if (primaryTweet) {
-      tweetText = primaryTweet.textContent?.trim()?.slice(0, 500) || "";
-    }
-
-    if (!tweetText) {
-      const allTweets = document.querySelectorAll('[data-testid="tweetText"]');
-      const texts = [];
-      allTweets.forEach((el, i) => {
-        if (i >= 3) return;
-        const t = el.textContent?.trim()?.slice(0, 200);
-        if (t && t.length > 10) texts.push(t);
-      });
-      tweetText = texts.join("\n---\n");
-    }
-
-    if (!tweetText || tweetText.length < 5) return "";
-
     const metrics = [];
-    document.querySelectorAll('[data-testid="like"], [data-testid="reply"], [data-testid="retweet"]').forEach((el) => {
+    article.querySelectorAll('[data-testid="like"], [data-testid="reply"], [data-testid="retweet"]').forEach((el) => {
       const label = el.getAttribute("aria-label");
       if (label) metrics.push(label);
     });
@@ -260,14 +274,17 @@ Return ONLY the two lines. No quotes, no preamble.`;
   // Habitat Generation
   // ==========================================================
 
-  function onContentChanged() {
+  function onArticleChanged() {
     if (!enabled || !hasKey) return;
 
-    const context = getPageContext();
+    const context = getArticleContext(currentArticle);
     if (!context || context.length < 5) return;
 
     if (context === lastTweetText) return;
     lastTweetText = context;
+
+    screenTitle.textContent = "Scanning…";
+    bottomText.textContent = "";
 
     requestId++;
     const thisRequest = requestId;
@@ -305,6 +322,28 @@ Return ONLY the two lines. No quotes, no preamble.`;
   }
 
   // ==========================================================
+  // Scroll-driven viewport tracking
+  // ==========================================================
+
+  function updateZoneOnScroll() {
+    if (!enabled) return;
+    const article = findMostCenteredArticle();
+    if (article && article !== currentArticle) {
+      currentArticle = article;
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (!inFlight) onArticleChanged();
+      }, DEBOUNCE_MS);
+    }
+  }
+
+  window.addEventListener("scroll", () => {
+    if (!enabled) return;
+    if (scrollRaf) cancelAnimationFrame(scrollRaf);
+    scrollRaf = requestAnimationFrame(updateZoneOnScroll);
+  }, true);
+
+  // ==========================================================
   // Twitter SPA Navigation Detection
   // ==========================================================
 
@@ -314,8 +353,12 @@ Return ONLY the two lines. No quotes, no preamble.`;
     lastUrl = currentUrl;
 
     lastTweetText = "";
+    currentArticle = null;
     if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => onContentChanged(), DEBOUNCE_MS);
+    debounceTimer = setTimeout(() => {
+      updateZoneOnScroll();
+      onArticleChanged();
+    }, DEBOUNCE_MS);
   }
 
   const urlObserver = new MutationObserver(() => {
@@ -328,14 +371,6 @@ Return ONLY the two lines. No quotes, no preamble.`;
     checkNavigation();
   });
 
-  window.addEventListener("scroll", () => {
-    if (!enabled) return;
-    if (scrollDebounce) clearTimeout(scrollDebounce);
-    scrollDebounce = setTimeout(() => {
-      if (!inFlight) onContentChanged();
-    }, 3000);
-  }, true);
-
   // ==========================================================
   // Lifecycle
   // ==========================================================
@@ -346,13 +381,18 @@ Return ONLY the two lines. No quotes, no preamble.`;
     lastTweetText = "";
     inFlight = false;
     requestId = 0;
+    currentArticle = null;
 
     urlObserver.observe(document.body, { childList: true, subtree: true });
 
     chrome.storage.local.get("an_api_key", (data) => {
       if (data.an_api_key) {
         hasKey = true;
-        setTimeout(() => onContentChanged(), 1000);
+        showCard("Scanning…", "");
+        setTimeout(() => {
+          updateZoneOnScroll();
+          onArticleChanged();
+        }, 1000);
       } else {
         hasKey = false;
         showKeyCard();
@@ -367,12 +407,11 @@ Return ONLY the two lines. No quotes, no preamble.`;
     requestId = 0;
     lastTweetText = "";
     lastUrl = "";
-    card.style.display = "none";
-    card.classList.remove("pd-card-show", "pd-card-hide");
+    currentArticle = null;
+    hideCard();
     keyRow.style.display = "none";
     if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
-    if (cardTimeout) { clearTimeout(cardTimeout); cardTimeout = null; }
-    if (scrollDebounce) { clearTimeout(scrollDebounce); scrollDebounce = null; }
+    if (scrollRaf) { cancelAnimationFrame(scrollRaf); scrollRaf = null; }
     urlObserver.disconnect();
   }
 
