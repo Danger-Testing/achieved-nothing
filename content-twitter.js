@@ -458,13 +458,14 @@ Return ONLY the two lines. No quotes, no preamble.`;
 
 (() => {
   const REPLY_PROMPT = `Generate button labels and full replies for a tweet. Output EXACTLY four lines:
-Line 1: Short label for the "nice" button (2-5 words, literal to the tweet content — e.g. "glaze lebron", "defend the hotdog")
-Line 2: Short label for the "not nice" button (2-5 words, literal and cutting — e.g. "bury 2k", "destroy the take")
+Line 1: Short label for the "nice" button — action verb + specific subject from the tweet (e.g. "defend drake", "big up the sprite ad", "back the robot")
+Line 2: Short label for the "not nice" button — action verb + specific subject from the tweet (e.g. "trash the nostalgia bait", "bury this take", "roast the sprite ad")
 Line 3: Full supportive reply (under 200 chars, agreeable, sounds like a real tweet)
 Line 4: Full critical reply (under 200 chars, offensive — genuinely tears into the tweet or the person, sounds like a real tweet)
 
 Rules:
-- Labels must be specific to the actual tweet topic — never generic
+- Labels MUST start with an action verb. They describe what you are doing, not what the tweet is about.
+- Labels must be specific to the actual content — never generic filler
 - Critical reply should be mean and have real bite, never use the word "expose"
 - Output ONLY the four lines. No numbering, no quotes, no extra text.`;
 
