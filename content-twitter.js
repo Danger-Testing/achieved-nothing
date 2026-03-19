@@ -159,7 +159,6 @@ Return ONLY the two lines. No quotes, no preamble.`;
   // ==========================================================
 
   function revealCard() {
-    return; // TEMP: card hidden
     if (cardShown) return;
     card.style.display = "flex";
     card.offsetHeight;
@@ -400,6 +399,7 @@ Return ONLY the two lines. No quotes, no preamble.`;
   // ==========================================================
 
   function startLoop() {
+    return; // TEMP: Twitter feature disabled
     enabled = true;
     lastUrl = location.href;
     lastTweetText = "";
