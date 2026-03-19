@@ -333,21 +333,22 @@
 }
 
 #rs-body {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 9px;
   width: 100%;
 }
 
-/* Arrow: z-stacked inside pill, bleeds -10px past the pill's left edge */
+/* Arrow: absolute sibling, last in DOM so always on top of both buttons */
 .rs-arrow {
   position: absolute;
   left: -10px;
-  top: 50%;
+  top: 0; /* set by JS via moveArrowTo() */
   transform: translateY(-50%);
-  z-index: 2;
+  z-index: 10;
   pointer-events: none;
-  display: block;
+  transition: top 0.15s ease;
 }
 
 /* --- Shared button resets --- */
@@ -371,7 +372,7 @@
 .rs-btn-supportive {
   width: 100%;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   border-radius: 100px;
   padding: 10px 15px;
   display: flex;

@@ -473,14 +473,14 @@ Rules:
   rsCard.innerHTML = `
     <div id="rs-body">
       <button class="rs-btn rs-btn-supportive" id="rs-supportive">
-        <svg class="rs-arrow" width="20" height="26" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2.5 2 L17.5 13 L2.5 24 Z" fill="#FFE040" stroke="#E87820" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-        </svg>
         <span class="rs-btn-label">Nice</span>
       </button>
       <button class="rs-btn rs-btn-critical" id="rs-critical">
         <span class="rs-btn-label">Not Nice</span>
       </button>
+      <svg class="rs-arrow" width="20" height="26" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.5 2 L17.5 13 L2.5 24 Z" fill="#FFE040" stroke="#E87820" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
     </div>
   `;
   document.documentElement.appendChild(rsCard);
@@ -495,8 +495,20 @@ Rules:
   const rsCritical = rsCard.querySelector("#rs-critical");
   const rsSupLabel = rsSupportive.querySelector(".rs-btn-label");
   const rsCritLabel = rsCritical.querySelector(".rs-btn-label");
+  const rsArrow = rsCard.querySelector(".rs-arrow");
+  const rsBody = rsCard.querySelector("#rs-body");
 
   rsCard.addEventListener("click", (e) => e.stopPropagation());
+
+  function moveArrowTo(btn) {
+    const bodyRect = rsBody.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    rsArrow.style.top = (btnRect.top - bodyRect.top + btnRect.height / 2) + "px";
+  }
+
+  rsSupportive.addEventListener("mouseenter", () => moveArrowTo(rsSupportive));
+  rsCritical.addEventListener("mouseenter", () => moveArrowTo(rsCritical));
+  rsCritical.addEventListener("mouseleave", () => moveArrowTo(rsSupportive));
 
   function positionCard() {
     const compose = document.querySelector('[data-testid="tweetTextarea_0"]');
@@ -527,6 +539,7 @@ Rules:
     rsCard.classList.add("rs-show");
     rsVisible = true;
     startPositionTracking();
+    requestAnimationFrame(() => moveArrowTo(rsSupportive));
   }
 
   function hideRsCard() {
