@@ -465,7 +465,7 @@ Line 4: Full critical reply (under 200 chars, offensive — genuinely tears into
 
 Rules:
 - Labels must be specific to the actual tweet topic — never generic
-- Critical reply should be mean and have real bite
+- Critical reply should be mean and have real bite, never use the word "expose"
 - Output ONLY the four lines. No numbering, no quotes, no extra text.`;
 
   // --- Build UI ---
